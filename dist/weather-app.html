@@ -1,0 +1,48 @@
+<html><head>
+  <SCRIPT src="./web-files/dtjava.js"></SCRIPT>
+<script>
+    function launchApplication(jnlpfile) {
+        dtjava.launch(            {
+                url : 'weather-app.jnlp',
+                jnlp_content : 'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPGpubHAgc3BlYz0iMS4wIiB4bWxuczpqZng9Imh0dHA6Ly9qYXZhZnguY29tIiBocmVmPSJ3ZWF0aGVyLWFwcC5qbmxwIj4KICA8aW5mb3JtYXRpb24+CiAgICA8dGl0bGU+d2VhdGhlci1hcHA8L3RpdGxlPgogICAgPHZlbmRvcj5aaU9TPC92ZW5kb3I+CiAgICA8ZGVzY3JpcHRpb24+bnVsbDwvZGVzY3JpcHRpb24+CiAgICA8b2ZmbGluZS1hbGxvd2VkLz4KICA8L2luZm9ybWF0aW9uPgogIDxyZXNvdXJjZXM+CiAgICA8ajJzZSB2ZXJzaW9uPSIxLjYrIiBocmVmPSJodHRwOi8vamF2YS5zdW4uY29tL3Byb2R1Y3RzL2F1dG9kbC9qMnNlIi8+CiAgICA8amFyIGhyZWY9IndlYXRoZXItYXBwLmphciIgc2l6ZT0iMjA3MjkiIGRvd25sb2FkPSJlYWdlciIgLz4KICA8L3Jlc291cmNlcz4KICA8YXBwbGljYXRpb24tZGVzYyBtYWluLWNsYXNzPSJ3ZWF0aGVyLmFwcC5TdGF0aW9uRnJhbWUiICBuYW1lPSJ3ZWF0aGVyLWFwcCIgPgogIDwvYXBwbGljYXRpb24tZGVzYz4KICA8dXBkYXRlIGNoZWNrPSJhbHdheXMiLz4KPC9qbmxwPgo='
+            },
+            {
+                javafx : '8.0+'
+            },
+            {}
+        );
+        return false;
+    }
+</script>
+
+<script>
+    function javafxEmbedweather.app() {
+        dtjava.embed(
+            {
+                id : 'weather.app',
+                toolkit : 'swing',
+                url : 'weather-app_browser.jnlp',
+                placeholder : 'javafx-app-placeholder',
+                width : '800',
+                height : '600',
+                jnlp_content : 'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPGpubHAgc3BlYz0iMS4wIiB4bWxuczpqZng9Imh0dHA6Ly9qYXZhZnguY29tIiBocmVmPSJ3ZWF0aGVyLWFwcF9icm93c2VyLmpubHAiPgogIDxpbmZvcm1hdGlvbj4KICAgIDx0aXRsZT53ZWF0aGVyLWFwcDwvdGl0bGU+CiAgICA8dmVuZG9yPlppT1M8L3ZlbmRvcj4KICAgIDxkZXNjcmlwdGlvbj5udWxsPC9kZXNjcmlwdGlvbj4KICAgIDxvZmZsaW5lLWFsbG93ZWQvPgogIDwvaW5mb3JtYXRpb24+CiAgPHJlc291cmNlcz4KICAgIDxqMnNlIHZlcnNpb249IjEuNisiIGhyZWY9Imh0dHA6Ly9qYXZhLnN1bi5jb20vcHJvZHVjdHMvYXV0b2RsL2oyc2UiLz4KICAgIDxqYXIgaHJlZj0id2VhdGhlci1hcHAuamFyIiBzaXplPSIyMDcyOSIgZG93bmxvYWQ9ImVhZ2VyIiAvPgogIDwvcmVzb3VyY2VzPgogIDxhcHBsZXQtZGVzYyAgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiIG1haW4tY2xhc3M9IndlYXRoZXIuYXBwLlN0YXRpb25GcmFtZSIgIG5hbWU9IndlYXRoZXItYXBwIiA+CiAgPC9hcHBsZXQtZGVzYz4KICA8dXBkYXRlIGNoZWNrPSJhbHdheXMiLz4KPC9qbmxwPgo='
+            },
+            {
+                javafx : '8.0+'
+            },
+            {
+                onGetSplash : function() {}
+            }
+        );
+    }
+    <!-- Embed FX application into web page once page is loaded -->
+    dtjava.addOnloadCallback(javafxEmbedweather.app);
+</script>
+
+</head><body>
+<h2>Test page for <b>weather-app</b></h2>
+  <b>Webstart:</b> <a href='weather-app.jnlp' onclick="return launchApplication('weather-app.jnlp');">click to launch this app as webstart</a><br><hr><br>
+
+  <!-- Applet will be inserted here -->
+  <div id='javafx-app-placeholder'></div>
+</body></html>

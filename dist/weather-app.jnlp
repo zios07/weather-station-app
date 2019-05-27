@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="weather-app.jnlp">
+  <information>
+    <title>weather-app</title>
+    <vendor>ZiOS</vendor>
+    <description>null</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="weather-app.jar" size="20729" download="eager" />
+  </resources>
+  <application-desc main-class="weather.app.StationFrame"  name="weather-app" >
+  </application-desc>
+  <update check="always"/>
+</jnlp>
