@@ -7,6 +7,7 @@ package weather.app.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import weather.app.model.Station;
 
 /**
@@ -15,20 +16,28 @@ import weather.app.model.Station;
  */
 public class StationService {
 
-    static final List<Station> stations;
+    static final List<Station> STATIONS;
     
     static  {
-        stations = new ArrayList<>();
+        STATIONS = new ArrayList<>();
     }
     public StationService() {
     }
 
     public void addStation(Station station) {
-        this.stations.add(station);
+        STATIONS.add(station);
     }
     
     public List<Station> getStations() {
-        return this.stations;
+        return STATIONS;
+    }
+
+    public Station getStationById(UUID stationID) {
+        return STATIONS.stream().filter(s -> s.getId().equals(stationID)).findFirst().get();
+    }
+    
+    public void saveState() {
+        
     }
     
 }

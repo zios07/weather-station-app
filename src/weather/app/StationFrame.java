@@ -9,7 +9,7 @@ import weather.app.service.StationService;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
-import javax.swing.WindowConstants;
+import java.util.UUID;
 import weather.app.model.Station;
 
 /**
@@ -18,7 +18,8 @@ import weather.app.model.Station;
  */
 public class StationFrame extends javax.swing.JFrame {
 
-    private StationService stationService; 
+    private final StationService stationService;
+
     /**
      * Creates new form NewJFrame
      */
@@ -45,7 +46,7 @@ public class StationFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jButton1.setLabel("Add station");
+        jButton1.setText("Create station");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -62,20 +63,17 @@ public class StationFrame extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null},
-                {null},
-                {null},
-                {null}
+
             },
             new String [] {
-                "Station Label"
+                "ID", "Station Label"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class
+                java.lang.Object.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false
+                false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -94,6 +92,7 @@ public class StationFrame extends javax.swing.JFrame {
         jScrollPane1.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
             jTable1.getColumnModel().getColumn(0).setResizable(false);
+            jTable1.getColumnModel().getColumn(1).setResizable(false);
         }
 
         javax.swing.GroupLayout stationPanelLayout = new javax.swing.GroupLayout(stationPanel);
@@ -155,11 +154,9 @@ public class StationFrame extends javax.swing.JFrame {
         Station station = new Station();
         station.setLabel(label);
         stationService.addStation(station);
-        DefaultTableModel model = (DefaultTableModel)jTable1.getModel();
-        List<Station> stations = stationService.getStations();
-        model.addRow(stations.toArray(new Station[stations.size()]));
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.addRow(new Object[]{station.getId(), station.getLabel()});
         jTable1.setModel(model);
-        JOptionPane.showMessageDialog(this, "Station added successfully");
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void stationLabelFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stationLabelFieldActionPerformed
@@ -167,8 +164,10 @@ public class StationFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_stationLabelFieldActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-        if(evt.getClickCount() == 2) {
-            new ReadingFrame().setVisible(true);
+        if (evt.getClickCount() == 2) {
+            int selectedRow = jTable1.getSelectedRow();
+            UUID stationID = (UUID) jTable1.getValueAt(selectedRow, 0);
+            new ReadingFrame(stationID).setVisible(true);
         }
     }//GEN-LAST:event_jTable1MouseClicked
 

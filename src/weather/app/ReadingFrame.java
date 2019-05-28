@@ -5,7 +5,20 @@
  */
 package weather.app;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Date;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableModel;
+import weather.app.model.Reading;
+import weather.app.model.Station;
+import weather.app.service.StationService;
 
 /**
  *
@@ -13,12 +26,28 @@ import javax.swing.WindowConstants;
  */
 public class ReadingFrame extends javax.swing.JFrame {
 
+    private UUID stationID;
+    private final StationService stationService = new StationService();
+    private Station station;
+    private Reading selectedReading = null;
+    private int selectedRow = -1;
+
     /**
      * Creates new form ReadingFrame
      */
     public ReadingFrame() {
         initComponents();
-        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE); 
+        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        this.addBtn.setEnabled(true);
+        this.removeBtn.setEnabled(false);
+        this.editBtn.setEnabled(false);
+    }
+
+    ReadingFrame(UUID stationID) {
+        this();
+        this.stationID = stationID;
+        this.station = this.stationService.getStationById(stationID);
+        this.initializeJTable();
     }
 
     /**
@@ -32,19 +61,23 @@ public class ReadingFrame extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        stationLabelField = new javax.swing.JTextField();
+        addBtn = new javax.swing.JButton();
+        DateField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        stationLabelField1 = new javax.swing.JTextField();
+        HighestTempField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        stationLabelField2 = new javax.swing.JTextField();
+        lowestTempField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        stationLabelField3 = new javax.swing.JTextField();
+        precipitationField = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        stationLabelField4 = new javax.swing.JTextField();
+        humidityField = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        editBtn = new javax.swing.JButton();
+        removeBtn = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        windField = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        clearBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -87,65 +120,88 @@ public class ReadingFrame extends javax.swing.JFrame {
             jTable1.getColumnModel().getColumn(6).setResizable(false);
         }
 
-        jButton1.setText("Add Reading");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        addBtn.setText("Add Reading");
+        addBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                addBtnActionPerformed(evt);
             }
         });
 
-        stationLabelField.addActionListener(new java.awt.event.ActionListener() {
+        DateField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                stationLabelFieldActionPerformed(evt);
+                DateFieldActionPerformed(evt);
             }
         });
 
         jLabel1.setText("Date");
 
-        stationLabelField1.addActionListener(new java.awt.event.ActionListener() {
+        HighestTempField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                stationLabelField1ActionPerformed(evt);
+                HighestTempFieldActionPerformed(evt);
             }
         });
 
         jLabel2.setText("Highest temp");
 
-        stationLabelField2.addActionListener(new java.awt.event.ActionListener() {
+        lowestTempField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                stationLabelField2ActionPerformed(evt);
+                lowestTempFieldActionPerformed(evt);
             }
         });
 
         jLabel3.setText("Lowest temp");
 
-        stationLabelField3.addActionListener(new java.awt.event.ActionListener() {
+        precipitationField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                stationLabelField3ActionPerformed(evt);
+                precipitationFieldActionPerformed(evt);
             }
         });
 
         jLabel4.setText("Precipitation");
 
-        stationLabelField4.addActionListener(new java.awt.event.ActionListener() {
+        humidityField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                stationLabelField4ActionPerformed(evt);
+                humidityFieldActionPerformed(evt);
             }
         });
 
         jLabel5.setText("Humudity");
 
-        jButton2.setText("Edit Reading");
-        jButton2.setToolTipText("");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        editBtn.setText("Edit Reading");
+        editBtn.setToolTipText("");
+        editBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                editBtnActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Remove Reading");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        removeBtn.setText("Remove Reading");
+        removeBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                removeBtnActionPerformed(evt);
+            }
+        });
+
+        jButton4.setText("Close window");
+        jButton4.setToolTipText("");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        windField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                windFieldActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setText("Wind");
+
+        clearBtn.setText("Clear");
+        clearBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearBtnActionPerformed(evt);
             }
         });
 
@@ -154,116 +210,298 @@ public class ReadingFrame extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(52, 52, 52)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(33, 33, 33)
-                        .addComponent(stationLabelField1, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(33, 33, 33)
-                        .addComponent(stationLabelField, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(33, 33, 33)
-                        .addComponent(stationLabelField2, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addGap(33, 33, 33)
-                        .addComponent(stationLabelField3, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addGap(33, 33, 33)
-                        .addComponent(stationLabelField4, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(67, 67, 67)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 840, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(23, 23, 23))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(52, 52, 52)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addGap(33, 33, 33)
+                        .addComponent(windField, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(33, 33, 33)
+                        .addComponent(HighestTempField, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(33, 33, 33)
+                        .addComponent(DateField, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(33, 33, 33)
+                        .addComponent(lowestTempField, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(33, 33, 33)
+                        .addComponent(precipitationField, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addGap(33, 33, 33)
+                        .addComponent(humidityField, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(67, 67, 67)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(editBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(addBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(removeBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(clearBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(26, 26, 26)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(DateField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(26, 26, 26)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(stationLabelField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(stationLabelField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(HighestTempField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(stationLabelField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lowestTempField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel3))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(stationLabelField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(precipitationField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel4)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(51, 51, 51)
-                        .addComponent(jButton1)
+                        .addComponent(addBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3)
+                        .addComponent(removeBtn)
                         .addGap(3, 3, 3)
-                        .addComponent(jButton2)))
+                        .addComponent(editBtn)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(stationLabelField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addGap(47, 47, 47)
+                    .addComponent(humidityField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5)
+                    .addComponent(clearBtn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(windField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6))
+                .addGap(15, 15, 15)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton4)
+                .addContainerGap(11, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-        if(evt.getClickCount() == 2) {
-            
+        if (evt.getClickCount() == 2) {
+            selectedRow = jTable1.getSelectedRow();
+            UUID readingID = (UUID) jTable1.getValueAt(selectedRow, 0);
+            selectedReading = this.station.getReadings().stream().filter(r -> r.getId().equals(readingID)).findFirst().get();
+            try {
+                DateField.setText("" + this.format(selectedReading.getDate()));
+            } catch (ParseException ex) {
+                DateField.setText("" + selectedReading.getDate());
+                Logger.getLogger(ReadingFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            HighestTempField.setText(Double.toString(selectedReading.getHighestTemp()));
+            lowestTempField.setText(Double.toString(selectedReading.getLowestTemp()));
+            precipitationField.setText(Double.toString(selectedReading.getPrecipitation()));
+            humidityField.setText(Double.toString(selectedReading.getHumidity()));
+            windField.setText(Double.toString(selectedReading.getWind()));
+            this.addBtn.setEnabled(false);
+            this.removeBtn.setEnabled(true);
+            this.editBtn.setEnabled(true);
+
         }
     }//GEN-LAST:event_jTable1MouseClicked
 
-    private void stationLabelFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stationLabelFieldActionPerformed
+    private void HighestTempFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HighestTempFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_stationLabelFieldActionPerformed
+    }//GEN-LAST:event_HighestTempFieldActionPerformed
 
-    private void stationLabelField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stationLabelField1ActionPerformed
+    private void lowestTempFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lowestTempFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_stationLabelField1ActionPerformed
+    }//GEN-LAST:event_lowestTempFieldActionPerformed
 
-    private void stationLabelField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stationLabelField2ActionPerformed
+    private void precipitationFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_precipitationFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_stationLabelField2ActionPerformed
+    }//GEN-LAST:event_precipitationFieldActionPerformed
 
-    private void stationLabelField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stationLabelField3ActionPerformed
+    private void humidityFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_humidityFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_stationLabelField3ActionPerformed
+    }//GEN-LAST:event_humidityFieldActionPerformed
 
-    private void stationLabelField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stationLabelField4ActionPerformed
+    private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editBtnActionPerformed
+        String dateStr = DateField.getText();
+        String highestTempStr = HighestTempField.getText();
+        String lowestTempStr = lowestTempField.getText();
+        String precipitationStr = precipitationField.getText();
+        String humidityStr = humidityField.getText();
+        String windStr = windField.getText();
+
+        if (isNumeric(highestTempStr) && isNumeric(lowestTempStr) && isNumeric(precipitationStr) && isNumeric(humidityStr) && isNumeric(windStr)) {
+            if (isDate(dateStr)) {
+
+                Date date = null;
+                try {
+                    date = this.parse(dateStr);
+                } catch (ParseException ex) {
+                    Logger.getLogger(ReadingFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                Double highestTemp = Double.parseDouble(highestTempStr);
+                Double lowestTemp = Double.parseDouble(lowestTempStr);
+                Double precipitation = Double.parseDouble(precipitationStr);
+                Double humidity = Double.parseDouble(humidityStr);
+                Double wind = Double.parseDouble(windStr);
+
+                Reading reading = new Reading(date, highestTemp, lowestTemp, precipitation, humidity, wind);
+                reading.setId(selectedReading.getId());
+                DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+                model.removeRow(selectedRow);
+                try {
+                    model.insertRow(selectedRow, new Object[]{reading.getId(), this.format(reading.getDate()), reading.getHighestTemp(), reading.getLowestTemp(), reading.getPrecipitation(), reading.getWind(), reading.getHumidity()});
+                } catch (ParseException ex) {
+                    Logger.getLogger(ReadingFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                jTable1.setModel(model);
+                this.station.getReadings().set(this.station.getReadings().indexOf(reading), reading);
+                stationService.saveState();
+            } else {
+                this.showError("Date shoud be in format : dd-MM-yyyy");
+            }
+        } else {
+            this.showError("Please enter Numbers instead of Strings");
+        }
+     }//GEN-LAST:event_editBtnActionPerformed
+
+    private void removeBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeBtnActionPerformed
+        this.station.getReadings().remove(selectedReading);
+        ((DefaultTableModel) jTable1.getModel()).removeRow(selectedRow);
+        this.clearBtnActionPerformed(null);
+    }//GEN-LAST:event_removeBtnActionPerformed
+
+    private void addBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBtnActionPerformed
+        String dateStr = DateField.getText();
+        String highestTempStr = HighestTempField.getText();
+        String lowestTempStr = lowestTempField.getText();
+        String precipitationStr = precipitationField.getText();
+        String humidityStr = humidityField.getText();
+        String windStr = windField.getText();
+
+        if (isNumeric(highestTempStr) && isNumeric(lowestTempStr) && isNumeric(precipitationStr) && isNumeric(humidityStr) && isNumeric(windStr)) {
+            if (isDate(dateStr)) {
+
+                Date date = null;
+                try {
+                    date = this.parse(dateStr);
+                } catch (ParseException ex) {
+                    Logger.getLogger(ReadingFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                Double highestTemp = Double.parseDouble(highestTempStr);
+                Double lowestTemp = Double.parseDouble(lowestTempStr);
+                Double precipitation = Double.parseDouble(precipitationStr);
+                Double humidity = Double.parseDouble(humidityStr);
+                Double wind = Double.parseDouble(windStr);
+
+                Reading reading = new Reading(date, highestTemp, lowestTemp, precipitation, humidity, wind);
+                DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+                try {
+                    model.addRow(new Object[]{reading.getId(), this.format(reading.getDate()), reading.getHighestTemp(), reading.getLowestTemp(), reading.getPrecipitation(), reading.getWind(), reading.getHumidity()});
+                } catch (ParseException ex) {
+                    Logger.getLogger(ReadingFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                jTable1.setModel(model);
+
+                this.station.getReadings().add(reading);
+                stationService.saveState();
+            } else {
+                this.showError("Date shoud be in format : dd-MM-yyyy");
+            }
+        } else {
+            this.showError("Please enter Numbers instead of Strings");
+        }
+
+    }//GEN-LAST:event_addBtnActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void DateFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DateFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_stationLabelField4ActionPerformed
+    }//GEN-LAST:event_DateFieldActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void windFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_windFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_windFieldActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void clearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearBtnActionPerformed
+        DateField.setText("");
+        HighestTempField.setText("");
+        lowestTempField.setText("");
+        precipitationField.setText("");
+        humidityField.setText("");
+        windField.setText("");
+        this.addBtn.setEnabled(true);
+        this.removeBtn.setEnabled(false);
+        this.editBtn.setEnabled(false);
+    }//GEN-LAST:event_clearBtnActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    public void showError(String message) {
+        JOptionPane optionPane = new JOptionPane(message, JOptionPane.ERROR_MESSAGE);
+        JDialog dialog = optionPane.createDialog("Failure");
+        dialog.setAlwaysOnTop(true);
+        dialog.setVisible(true);
+    }
 
-    }//GEN-LAST:event_jButton1ActionPerformed
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isDate(String inDate) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateFormat.setLenient(false);
+        try {
+            dateFormat.parse(inDate.trim());
+        } catch (ParseException pe) {
+            return false;
+        }
+        return true;
+    }
+
+    public Date parse(String date) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateFormat.setLenient(false);
+        return dateFormat.parse(date.trim());
+    }
+
+    public String format(Date date) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateFormat.setLenient(false);
+        return dateFormat.format(date);
+    }
+
+    private void initializeJTable() {
+        if (this.station.getReadings().size() > 0) {
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            this.station.getReadings().forEach((reading) -> {
+                model.addRow(new Object[]{reading.getId(), reading.getDate(), reading.getHighestTemp(), reading.getLowestTemp(), reading.getPrecipitation(), reading.getWind(), reading.getHumidity()});
+            });
+            jTable1.setModel(model);
+        }
+
+    }
 
     /**
      * @param args the command line arguments
@@ -272,7 +510,7 @@ public class ReadingFrame extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -301,20 +539,25 @@ public class ReadingFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JTextField DateField;
+    private javax.swing.JTextField HighestTempField;
+    private javax.swing.JButton addBtn;
+    private javax.swing.JButton clearBtn;
+    private javax.swing.JButton editBtn;
+    private javax.swing.JTextField humidityField;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextField stationLabelField;
-    private javax.swing.JTextField stationLabelField1;
-    private javax.swing.JTextField stationLabelField2;
-    private javax.swing.JTextField stationLabelField3;
-    private javax.swing.JTextField stationLabelField4;
+    private javax.swing.JTextField lowestTempField;
+    private javax.swing.JTextField precipitationField;
+    private javax.swing.JButton removeBtn;
+    private javax.swing.JTextField windField;
     // End of variables declaration//GEN-END:variables
+
 }

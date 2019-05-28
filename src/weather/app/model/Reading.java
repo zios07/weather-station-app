@@ -6,13 +6,15 @@
 package weather.app.model;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  *
  * @author ZiOS
  */
 public class Reading {
-    
+
+    private UUID id;
     private Date date;
     private Double highestTemp;
     private Double lowestTemp;
@@ -21,6 +23,7 @@ public class Reading {
     private Double wind;
 
     public Reading(Date date, Double highestTemp, Double lowestTemp, Double precipitation, Double humidity, Double wind) {
+        this.id = UUID.randomUUID();
         this.date = date;
         this.highestTemp = highestTemp;
         this.lowestTemp = lowestTemp;
@@ -76,7 +79,23 @@ public class Reading {
     public void setWind(Double wind) {
         this.wind = wind;
     }
-    
-    
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public UUID getId() {
+        return this.id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Reading && this.id.equals(((Reading) obj).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode(); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

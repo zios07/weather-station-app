@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="weather-app.jnlp">
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="weather-app_browser.jnlp">
   <information>
     <title>weather-app</title>
     <vendor>ZiOS</vendor>
@@ -8,9 +8,9 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="weather-app.jar" size="27800" download="eager" />
+    <jar href="weather-app.jar" size="24586" download="eager" />
   </resources>
-  <application-desc main-class="weather.app.StationFrame"  name="weather-app" >
-  </application-desc>
+  <applet-desc  width="800" height="600" main-class="weather.app.StationFrame"  name="weather-app" >
+  </applet-desc>
   <update check="always"/>
 </jnlp>

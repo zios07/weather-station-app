@@ -5,7 +5,9 @@
  */
 package weather.app.model;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -13,8 +15,14 @@ import java.util.List;
  */
 public class Station {
     
+    private UUID id;
     private String label;
     private List<Reading> readings;
+    
+    public Station() {
+        this.id = UUID.randomUUID();
+        this.readings = new ArrayList<>();
+    }
 
     public String getLabel() {
         return label;
@@ -31,5 +39,12 @@ public class Station {
     public void setReadings(List<Reading> readings) {
         this.readings = readings;
     }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
     
+    public UUID getId() {
+        return this.id;
+    }
 }
