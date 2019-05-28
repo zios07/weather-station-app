@@ -496,7 +496,11 @@ public class ReadingFrame extends javax.swing.JFrame {
         if (this.station.getReadings().size() > 0) {
             DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
             this.station.getReadings().forEach((reading) -> {
-                model.addRow(new Object[]{reading.getId(), reading.getDate(), reading.getHighestTemp(), reading.getLowestTemp(), reading.getPrecipitation(), reading.getWind(), reading.getHumidity()});
+                try {
+                    model.addRow(new Object[]{reading.getId(), this.format(reading.getDate()), reading.getHighestTemp(), reading.getLowestTemp(), reading.getPrecipitation(), reading.getWind(), reading.getHumidity()});
+                } catch (ParseException ex) {
+                    Logger.getLogger(ReadingFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
             });
             jTable1.setModel(model);
         }
